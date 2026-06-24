@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { useAppSelector } from '@/redux/hooks';
 import { RoleEnum } from '@/types/auth.types';
-import { logoutThunk } from '@/redux/slice/authSlice';
+import { useLogoutMutation } from '@/redux/api/authApi';
 
 interface MenuItem {
   path: string;
@@ -45,7 +45,7 @@ const menuItems: MenuItem[] = [
 
 export default function Sidebar() {
   const location = useLocation();
-  const dispatch = useAppDispatch();
+  const [logout] = useLogoutMutation();
   const user = useAppSelector((state) => state.auth.user);
 
   if (!user) return null;
@@ -90,7 +90,7 @@ export default function Sidebar() {
       <div className="px-4 mt-auto">
         <div className="h-px w-full bg-outline/10 my-4"></div>
         <button 
-          onClick={() => dispatch(logoutThunk())} 
+          onClick={() => logout()} 
           className="flex w-full items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg hover-lift transition-all duration-300 group"
         >
           <span className="material-symbols-outlined text-[22px] transition-transform duration-300 group-hover:scale-110">logout</span>

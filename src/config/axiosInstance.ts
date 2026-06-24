@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ENV } from '@/config/env';
 
 // ─── Axios Instance ────────────────────────────────────────────────────────────
-// - baseURL: ENV.API_BASE_URL/api/v1
+// - baseURL: ENV.API_BASE_URL/api/
 // - withCredentials: true  (cần cho cookie refresh_token của BE)
 // - Interceptor request: attach Bearer token từ localStorage
 // - Interceptor response: tự động refresh token khi gặp 401

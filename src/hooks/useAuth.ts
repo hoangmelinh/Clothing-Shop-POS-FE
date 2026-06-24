@@ -1,27 +1,43 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { loginThunk, logoutThunk, clearError } from '@/redux/slice/authSlice';
+import { clearError } from '@/redux/slice/authSlice';
+import { useLoginMutation, useLogoutMutation } from '@/redux/api/authApi';
 import type { LoginRequest } from '../types/auth.types';
 
 export function useAuth() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { user, accessToken, isAuthenticated, isLoading, error } = useAppSelector((state) => state.auth);
+  const { user, accessToken, isAuthenticated, error } = useAppSelector((state) => state.auth);
+  
+  const [loginMutation, { isLoading: isLoginLoading }] = useLoginMutation();
+  const [logoutMutation, { isLoading: isLogoutLoading }] = useLogoutMutation();
 
   const login = async (credentials: LoginRequest) => {
-    const result = await dispatch(loginThunk(credentials));
-    if (loginThunk.fulfilled.match(result)) {
+    try {
+      await loginMutation(credentials).unwrap();
       navigate('/dashboard');
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const logout = async () => {
-    await dispatch(logoutThunk());
-    navigate('/login');
+    try {
+      await logoutMutation().unwrap();
+      navigate('/login');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return {
-    user, accessToken, isAuthenticated, isLoading, error,
-    login, logout, clearError: () => dispatch(clearError()),
+    user,
+    accessToken,
+    isAuthenticated,
+    isLoading: isLoginLoading || isLogoutLoading,
+    error,
+    login,
+    logout,
+    clearError: () => dispatch(clearError()),
   };
 }

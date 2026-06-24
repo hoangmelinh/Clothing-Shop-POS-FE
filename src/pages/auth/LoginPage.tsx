@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { loginThunk } from '@/redux/slice/authSlice';
+import { useAppSelector } from '@/redux/hooks';
+import { useLoginMutation } from '@/redux/api/authApi';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
@@ -11,17 +11,17 @@ export default function LoginPage() {
   const [localError, setLocalError] = useState<string | null>(null);
   
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { isLoading, error } = useAppSelector((state) => state.auth);
+  const [login, { isLoading }] = useLoginMutation();
+  const { error } = useAppSelector((state) => state.auth);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError(null);
     try {
-      await dispatch(loginThunk({ username: email, password })).unwrap();
+      await login({ username: email, password }).unwrap();
       navigate('/dashboard');
     } catch (err: any) {
-      setLocalError(err || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.');
+      setLocalError(err?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.');
     }
   };
 
