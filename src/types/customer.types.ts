@@ -7,24 +7,19 @@ export interface CustomerGroup {
   description: string;
 }
 
-export interface Customer {
-  id: number;
+export interface CustomerRequest {
   fullName: string;
   phone: string;
   dateOfBirth?: string;
   gender: GenderEnum;
   address?: string;
   note?: string;
-  groupId: number;
-  groupName?: string;
-  status: 'ACTIVE' | 'INACTIVE';
-  createdAt: string;
-  updatedAt: string;
-  rewardPoints?: number;
-  vouchers?: VoucherInfo[];
+  groupId?: number;
 }
 
-export interface VoucherInfo {
+
+// Định nghĩa một voucher của khách
+export interface CustomerVoucher {
   id: number;
   voucherCode: string;
   voucherName: string;
@@ -34,12 +29,37 @@ export interface VoucherInfo {
   expiredAt: string;
 }
 
-export interface CustomerRequest {
+// Định nghĩa ông Khách Hàng
+export interface Customer {
+  id: number;
   fullName: string;
   phone: string;
-  dateOfBirth?: string;
-  gender: GenderEnum;
-  address?: string;
-  note?: string;
-  customerGroupId?: number;
+  dateOfBirth: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  address: string;
+  note: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  createdAt: string;
+  rewardPoints: number;
+  customerGroup: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  vouchers: CustomerVoucher[];
+}
+
+// Định nghĩa tham số tìm kiếm gửi lên Backend
+export interface CustomerFilterParams {
+  keyword?: string;
+  page?: number;
+  size?: number;
+}
+
+
+// Bộ tham số dùng cho chức năng Lọc/Tìm kiếm
+export interface CustomerFilterParams {
+  keyword?: string;
+  page?: number;
+  size?: number;
 }

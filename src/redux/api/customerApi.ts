@@ -6,29 +6,19 @@ export const customerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getCustomers: builder.query<RestResponse<PageResponse<Customer>>, PaginationParams & { search?: string }>({
       query: (params) => ({
-        url: '/crm/customers/search',
+        url: '/customers',
         method: 'GET',
-        params: {
-          keyword: params.search || '',
-          page: params.page,
-          size: params.size,
-        },
+        params,
       }),
       providesTags: (result) =>
         result?.data?.content
           ? [
-              ...result.data.content.map(({ id }) => ({ type: 'Customer' as const, id })),
-              { type: 'Customer', id: 'LIST' },
-            ]
+            ...result.data.content.map(({ id }) => ({ type: 'Customer' as const, id })),
+            { type: 'Customer', id: 'LIST' },
+          ]
           : [{ type: 'Customer', id: 'LIST' }],
     }),
-    getCustomerById: builder.query<RestResponse<Customer>, number>({
-      query: (id) => ({
-        url: `/crm/customers/${id}`,
-        method: 'GET',
-      }),
-      providesTags: (_result, _error, id) => [{ type: 'Customer', id }],
-    }),
+
     createCustomer: builder.mutation<RestResponse<Customer>, CustomerRequest>({
       query: (data) => ({
         url: '/crm/customers',
@@ -39,7 +29,7 @@ export const customerApi = baseApi.injectEndpoints({
     }),
     updateCustomer: builder.mutation<RestResponse<Customer>, { id: number; data: CustomerRequest }>({
       query: ({ id, data }) => ({
-        url: `/crm/customers/${id}`,
+        url: `/customers/${id}`,
         method: 'PUT',
         data,
       }),
@@ -48,16 +38,56 @@ export const customerApi = baseApi.injectEndpoints({
         { type: 'Customer', id: 'LIST' },
       ],
     }),
-    getCustomerGroups: builder.query<RestResponse<PageResponse<CustomerGroup>>, void>({
+    deactivateCustomer: builder.mutation<RestResponse<void>, number>({
+      query: (id) => ({
+        url: `/crm/customers/${id}/deactivate`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: [{ type: 'Customer', id: 'LIST' }],
+    }),
+    activateCustomer: builder.mutation<RestResponse<void>, number>({
+      query: (id) => ({
+        url: `/crm/customers/${id}/activate`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: [{ type: 'Customer', id: 'LIST' }],
+    }),
+    getCustomerGroups: builder.query<RestResponse<CustomerGroup[]>, void>({
       query: () => ({
-        url: '/crm/customer-groups',
+        url: '/customer-groups',
         method: 'GET',
-        params: {
-          page: 0,
-          size: 100,
-        },
       }),
     }),
+
+    // ==============================================================
+    // list all customers with search and pagination
+    // ==============================================================
+    searchCustomers: builder.query<RestResponse<PageResponse<Customer>>, any>({
+      query: (params) => ({
+        url: '/crm/customers/search',
+        method: 'GET',
+        params,
+      }),
+      providesTags: (result) =>
+        result?.data?.content
+          ? [
+            ...result.data.content.map(({ id }) => ({ type: 'Customer' as const, id })),
+            { type: 'Customer', id: 'LIST' },
+          ]
+          : [{ type: 'Customer', id: 'LIST' }],
+    }),
+    // ==============================================================
+
+    // get customer by id
+    getCustomerById: builder.query<RestResponse<Customer>, number | string>({
+      query: (id) => ({
+        url: `/crm/customers/${id}`,
+        method: 'GET',
+      }),
+      // Khi có lệnh xóa/cập nhật thì data này sẽ tự làm mới
+      providesTags: (result, error, id) => [{ type: 'Customer', id }],
+    }),
+
   }),
   overrideExisting: false,
 });
@@ -68,4 +98,7 @@ export const {
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
   useGetCustomerGroupsQuery,
+  useSearchCustomersQuery,
+  useDeactivateCustomerMutation,
+  useActivateCustomerMutation,
 } = customerApi;
