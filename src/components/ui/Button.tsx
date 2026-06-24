@@ -23,12 +23,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseStyles = 'inline-flex items-center justify-center font-button rounded transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseStyles = 'inline-flex items-center justify-center font-button rounded transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
     
     const variants = {
-      primary: 'bg-primary text-on-primary hover:bg-primary/90',
-      secondary: 'bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80',
-      danger: 'bg-error text-on-error hover:bg-error/90',
+      primary: 'bg-gradient-to-r from-primary to-[#18754a] text-on-primary shadow-[0_4px_14px_0_rgba(15,81,50,0.2)] hover:shadow-[0_6px_20px_rgba(15,81,50,0.3)] hover:-translate-y-0.5 border border-[#1b8a54]/50',
+      secondary: 'bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 hover:-translate-y-0.5 hover:shadow-md transition-all',
+      danger: 'bg-error text-on-error hover:bg-error/90 hover:-translate-y-0.5 hover:shadow-[0_4px_14px_0_rgba(186,26,26,0.2)] transition-all',
       ghost: 'bg-transparent text-primary hover:bg-primary/10',
       outline: 'bg-transparent border border-outline text-on-surface hover:border-primary hover:text-primary',
     };

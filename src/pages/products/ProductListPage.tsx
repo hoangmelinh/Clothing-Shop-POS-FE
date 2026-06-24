@@ -16,38 +16,46 @@ export default function ProductListPage() {
     <div className="flex flex-col lg:flex-row gap-8">
       {/* Filters Sidebar */}
       <aside className="w-full lg:w-64 flex-shrink-0 mb-lg lg:mb-0">
-        <div className="bg-primary-container text-on-primary-container p-md rounded-lg sticky top-32">
-          <div className="flex items-center justify-between mb-md border-b border-on-primary-container/20 pb-sm">
-            <h2 className="font-headline-md text-headline-md text-on-primary">Bộ lọc</h2>
-            <span className="material-symbols-outlined text-on-primary">tune</span>
-          </div>
-          <div className="space-y-md">
-            <div>
-              <h3 className="font-label-caps text-label-caps text-on-primary-container/80 mb-sm uppercase">Danh mục</h3>
-              <div className="space-y-2">
-                {['Tất cả', 'Đồ may sẵn', 'Đồ da', 'Phụ kiện'].map((cat, i) => (
-                  <label key={cat} className="flex items-center space-x-2 cursor-pointer group">
-                    <input defaultChecked={i === 0} className="form-checkbox h-4 w-4 rounded-sm text-primary" type="checkbox" />
-                    <span className="font-body-sm text-body-sm text-on-primary">{cat}</span>
-                  </label>
-                ))}
+        <div className="space-y-4 sticky top-28">
+          <div className="bg-primary-container text-on-primary-container p-md rounded-lg shadow-sm">
+            <div className="flex items-center justify-between mb-md border-b border-on-primary-container/20 pb-sm">
+              <h2 className="font-headline-md text-headline-md text-on-primary">Bộ lọc</h2>
+              <span className="material-symbols-outlined text-on-primary">tune</span>
+            </div>
+            <div className="space-y-md">
+              <div>
+                <h3 className="font-label-caps text-label-caps text-on-primary-container/80 mb-sm uppercase">Danh mục</h3>
+                <div className="space-y-2">
+                  {['Tất cả', 'Đồ may sẵn', 'Đồ da', 'Phụ kiện'].map((cat, i) => (
+                    <label key={cat} className="flex items-center space-x-2 cursor-pointer group">
+                      <input defaultChecked={i === 0} className="form-checkbox h-4 w-4 rounded-sm text-primary" type="checkbox" />
+                      <span className="font-body-sm text-body-sm text-on-primary">{cat}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-label-caps text-label-caps text-on-primary-container/80 mb-sm uppercase pt-sm border-t border-on-primary-container/20">Trạng thái</h3>
+                <div className="space-y-2">
+                  {['Còn hàng', 'Sắp hết', 'Hết hàng'].map((s, i) => (
+                    <label key={s} className="flex items-center space-x-2 cursor-pointer group">
+                      <input defaultChecked={i === 0} name="status" className="form-radio h-4 w-4 text-primary" type="radio" />
+                      <span className="font-body-sm text-body-sm text-on-primary">{s}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
-            <div>
-              <h3 className="font-label-caps text-label-caps text-on-primary-container/80 mb-sm uppercase pt-sm border-t border-on-primary-container/20">Trạng thái</h3>
-              <div className="space-y-2">
-                {['Còn hàng', 'Sắp hết', 'Hết hàng'].map((s, i) => (
-                  <label key={s} className="flex items-center space-x-2 cursor-pointer group">
-                    <input defaultChecked={i === 0} name="status" className="form-radio h-4 w-4 text-primary" type="radio" />
-                    <span className="font-body-sm text-body-sm text-on-primary">{s}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            <Button variant="outline" className="w-full mt-md bg-white text-primary border-none hover:bg-white/90 hover:text-primary transition-all duration-300 font-semibold shadow-sm">
+              Áp dụng lọc
+            </Button>
           </div>
-          <Button className="w-full mt-md bg-on-primary text-primary-container hover:bg-white transition-colors">
-            Áp dụng lọc
-          </Button>
+
+          <Link to="/products/new" className="block w-full">
+            <Button variant="primary" className="w-full justify-center" leftIcon={<span className="material-symbols-outlined text-[18px]">add</span>}>
+              Thêm sản phẩm
+            </Button>
+          </Link>
         </div>
       </aside>
 
@@ -57,13 +65,6 @@ export default function ProductListPage() {
           <div>
             <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Bộ sưu tập mùa thu</h1>
             <p className="font-body-md text-body-md text-on-surface-variant mt-2">Hiển thị 24 sản phẩm trong Đồ may sẵn</p>
-          </div>
-          <div className="flex gap-sm">
-            <Link to="/products/new">
-              <Button leftIcon={<span className="material-symbols-outlined text-[18px]">add</span>}>
-                Thêm sản phẩm
-              </Button>
-            </Link>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-gutter">
