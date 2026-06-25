@@ -8,8 +8,8 @@ export interface Category {
 
 export interface ProductAttribute {
   id?: number;
-  key: string;
-  value: string;
+  attrKey: string;
+  attrValue: string;
 }
 
 export interface ProductOptionValue {
@@ -56,8 +56,17 @@ export interface ProductRequest {
   description?: string;
   categoryId: number;
   imageUrls?: string[];
-  options?: Omit<ProductOption, 'id'>[];
-  variants: Omit<ProductVariant, 'id'>[];
+  options?: { name: string; position: number; values: string[] }[];
+  variants: {
+    sku: string;
+    imageUrl?: string;
+    option1Value?: string;
+    option2Value?: string;
+    option3Value?: string;
+    salePrice: number;
+    importPrice?: number;
+    lowStockThreshold: number;
+  }[];
   attributes?: Omit<ProductAttribute, 'id'>[];
 }
 
@@ -71,4 +80,5 @@ export interface ProductFilterParams {
   name?: string;
   categoryId?: number;
   isDeleted?: boolean;
+  stockStatus?: string;
 }

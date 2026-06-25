@@ -4,8 +4,10 @@ import { createPortal } from 'react-dom';
 export interface ModalProps {
   isOpen: boolean;
   onClose?: () => void;
-  title?: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+
+  title?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+
   children?: React.ReactNode;
   footer?: React.ReactNode;
 }
@@ -46,6 +48,8 @@ export const Modal: React.FC<ModalProps> = ({
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-2xl',
+    '2xl': 'max-w-5xl',
+    full: 'max-w-[90vw]',
   };
 
   return createPortal(
