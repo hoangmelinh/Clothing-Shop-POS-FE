@@ -7,9 +7,10 @@ interface ProductTableProps {
     products: any[];
     getStatus: (variants: ProductVariant[]) => { text: string; class: 'success' | 'warning' | 'danger' | 'default' };
     getVariantStatus: (quantity: number, threshold?: number) => any;
+    onEdit: (product: any) => void;
 }
 
-export default function ProductTable({ products, getStatus, getVariantStatus }: ProductTableProps) {
+export default function ProductTable({ products, getStatus, getVariantStatus, onEdit }: ProductTableProps) {
     if (products.length === 0) {
         return (
             <div className="text-center py-16 text-on-surface-variant">

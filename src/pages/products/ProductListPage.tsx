@@ -1,33 +1,40 @@
 
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
 import { useGetProductsQuery } from '@/redux/api/productApi';
 import { useState } from 'react';
-import { ProductVariant } from '@/types/product.types';
+import { Product, ProductVariant } from '@/types/product.types';
 import { useGetCategoriesQuery } from '@/redux/api/categoryApi';
 import ProductFilterSidebar from './ProductFilterSidebar';
 import ProductTable from './ProductTable';
+import ProductFormModal from './components/ProductFormModal';
 
 export default function ProductListPage() {
   // ===== STATE =====
   const [page, setPage] = useState(0);
-  const [size] = useState(10);
-
+  const [size, setSize] = useState(10);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   // Filter states (gửi lên API)
   const [search, setSearch] = useState('');
   const [productName, setProductName] = useState('');
   const [sku, setSku] = useState('');
   const [categoryID, setCategoryID] = useState<number | undefined>(undefined);
   const [isDeleted, setIsDeleted] = useState<boolean | undefined>(false);
-  const [stockStatus, setStockStatus] = useState<string | undefined>(undefined); // 👈 THÊM STATE NÀY
+  const [stockStatus, setStockStatus] = useState<string | undefined>(undefined);
 
   // Temporary filter states (cho sidebar)
   const [tempSearch, setTempSearch] = useState('');
   const [tempProductName, setTempProductName] = useState('');
   const [tempSku, setTempSku] = useState('');
   const [tempCategoryID, setTempCategoryID] = useState<number | undefined>(undefined);
-  const [tempStatus, setTempStatus] = useState('Tất cả'); // 👈 ĐỔI DEFAULT THÀNH 'Tất cả'
+  const [tempStatus, setTempStatus] = useState('Tất cả');
+
+  // Hàm mở modal khi sửa
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setIsModalOpen(true);
+  };
 
   // ===== API CALLS =====
   const productFilterParams = {
@@ -38,7 +45,7 @@ export default function ProductListPage() {
     sku: sku || undefined,
     categoryID: categoryID || undefined,
     isDeleted: isDeleted !== undefined ? isDeleted : undefined,
-    stockStatus: stockStatus || undefined, // 👈 THÊM PARAM NÀY
+    stockStatus: stockStatus || undefined,
   };
 
   const { data: responseData, isLoading, isFetching } = useGetProductsQuery(productFilterParams);
@@ -155,26 +162,46 @@ export default function ProductListPage() {
 
     }
   };
+  // ===== FILTER HANDLERS =====
+  const handleSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSize(Number(e.target.value));
+    setPage(0); // Reset về trang đầu khi đổi size
+  };
 
   // ===== RENDER =====
   return (
     <div className="flex flex-col lg:flex-row gap-8">
-      {/* Filter Sidebar */}
-      <ProductFilterSidebar
-        tempProductName={tempProductName}
-        setTempProductName={setTempProductName}
-        tempSku={tempSku}
-        setTempSku={setTempSku}
-        tempCategoryID={tempCategoryID}
-        setTempCategoryID={setTempCategoryID}
-        tempStatus={tempStatus}
-        setTempStatus={setTempStatus}
-        categories={categories}
-        handleApplyFilter={handleApplyFilter}
-        handleClearFilters={handleClearFilters}
-      />
+      {/* ===== CỘT BÊN TRÁI: Filter + Button ===== */}
+      <div className="w-full lg:w-80 flex-shrink-0">
+        {/* Filter Sidebar */}
+        <ProductFilterSidebar
+          tempProductName={tempProductName}
+          setTempProductName={setTempProductName}
+          tempSku={tempSku}
+          setTempSku={setTempSku}
+          tempCategoryID={tempCategoryID}
+          setTempCategoryID={setTempCategoryID}
+          tempStatus={tempStatus}
+          setTempStatus={setTempStatus}
+          categories={categories}
+          handleApplyFilter={handleApplyFilter}
+          handleClearFilters={handleClearFilters}
+        />
 
-      {/* Product Table */}
+        {/* Button Thêm sản phẩm */}
+        <Button
+          variant="primary"
+          onClick={() => { setEditingProduct(null); setIsModalOpen(true); }}
+          className="w-full justify-center mt-4"
+          leftIcon={<span className="material-symbols-outlined text-sm">add</span>}
+        >
+          Thêm sản phẩm
+        </Button>
+      </div>
+
+
+
+      {/*  Product Table  */}
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap justify-between items-end mb-lg gap-4">
           <div>
@@ -211,6 +238,7 @@ export default function ProductListPage() {
                 search
               </span>
             </div>
+
           </div>
         </div>
 
@@ -222,8 +250,20 @@ export default function ProductListPage() {
               products={products}
               getStatus={getStatus}
               getVariantStatus={getVariantStatus}
+              onEdit={handleEditProduct}
             />
-            <div className="mt-xl">
+            <div className="mt-xl flex justify-end items-center gap-4">
+              <select
+                value={size}
+                onChange={handleSizeChange}
+                className="px-5 py-1.5 border border-outline/30 rounded-lg bg-surface-container-lowest text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                <option value="5">5 / trang</option>
+                <option value="10">10 / trang</option>
+                <option value="20">20 / trang</option>
+                <option value="50">50 / trang</option>
+              </select>
+
               <Pagination
                 totalPages={pagination?.totalPages || 0}
                 currentPage={page}
@@ -234,6 +274,12 @@ export default function ProductListPage() {
           </>
         )}
       </div>
+      <ProductFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        product={editingProduct}
+        categories={categories}
+      />
     </div>
   );
 }
