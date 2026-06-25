@@ -56,7 +56,7 @@ export default function CustomerDetailPage() {
   console.log("3. API Trả về (orderPageData.number):", orderPageData?.number);
   console.log("========================");
 
-  const customer = responseData?.data as import("@/types/customer.types").CustomerWithGroup | undefined;
+  const customer = responseData?.data;
 
   // Hiệu ứng tải dữ liệu
   if (isLoading) {

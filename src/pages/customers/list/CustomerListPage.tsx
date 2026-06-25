@@ -45,7 +45,7 @@ export default function CustomerListPage() {
     setPage(0);
   };
 
-  const openVoucherModal = (customer: import("@/types/customer.types").CustomerWithGroup) => {
+  const openVoucherModal = (customer: Customer) => {
     setSelectedVoucherData({
       name: customer.fullName,
       group: customer.customerGroup?.code || "GỖ MỚI",
@@ -130,7 +130,7 @@ export default function CustomerListPage() {
       key: "group",
       header: "Hạng",
       render: (row) => {
-        const cus = row as import("@/types/customer.types").CustomerWithGroup;
+        const cus = row;
         const code = cus.customerGroup?.code || "GỖ MỚI";
         const variant = code === "GOLD" ? "warning" : code === "SILVER" ? "default" : "info";
         return (
