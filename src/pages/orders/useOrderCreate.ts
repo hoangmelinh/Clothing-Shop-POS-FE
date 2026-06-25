@@ -257,7 +257,6 @@ export function useOrderCreate() {
       const orderPayload = {
         customerId: customerType === 'GUEST' ? 1 : (selectedCustomer?.id || 1),
         paidAmount: paymentMethod === 'QR_PAYOS' ? total : Number(customerPaid),
-        paymentMethod,
         note: note || undefined,
         pointsToUse: customerType === 'MEMBER' ? pointsToUse : 0,
         voucherCode: (customerType === 'MEMBER' && isVoucherValid && voucherCode) ? voucherCode.trim() : undefined,
