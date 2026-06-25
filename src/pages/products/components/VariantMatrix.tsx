@@ -246,8 +246,8 @@ export function VariantMatrix({ productName, options, variants, onChange }: Vari
                     <Input
                       id={`sale-${index}`}
                       type="number"
-                      value={variant.salePrice ?? ''}
-                      onChange={(e) => updateVariant(index, 'salePrice', Number(e.target.value))}
+                      value={variant.salePrice || ''}
+                      onChange={(e) => updateVariant(index, 'salePrice', e.target.value === '' ? 0 : Number(e.target.value))}
                       placeholder="0"
                       disabled={!isSelected}
                       className="py-1 text-xs w-24 text-right"
@@ -259,8 +259,8 @@ export function VariantMatrix({ productName, options, variants, onChange }: Vari
                     <Input
                       id={`import-${index}`}
                       type="number"
-                      value={variant.importPrice ?? ''}
-                      onChange={(e) => updateVariant(index, 'importPrice', Number(e.target.value))}
+                      value={variant.importPrice || ''}
+                      onChange={(e) => updateVariant(index, 'importPrice', e.target.value === '' ? 0 : Number(e.target.value))}
                       placeholder="0"
                       disabled={!isSelected}
                       className="py-1 text-xs w-24 text-right"
