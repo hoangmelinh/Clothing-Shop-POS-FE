@@ -49,7 +49,6 @@ export const routes: RouteObject[] = [
       {
         element: <MainLayout />,
         children: [
-<<<<<<< Updated upstream
           // Dashboard (Admin, Sale)
           {
             element: <RoleRoute allowedRoles={['ROLE_ADMIN', 'ROLE_SALE']} />,
@@ -58,10 +57,6 @@ export const routes: RouteObject[] = [
               { path: 'dashboard', element: <DashboardPage /> },
             ]
           },
-=======
-          { index: true, element: <DashboardPage /> },
-          { path: "dashboard", element: <DashboardPage /> },
->>>>>>> Stashed changes
 
           // Products (Admin, Kho)
           {
