@@ -115,9 +115,9 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
                             onDragOver={(e) => handleDragOver(e, index)}
                             onDrop={() => handleDrop(index)}
                             onDragEnd={handleDragEnd}
-                            className={`relative aspect-square rounded-lg overflow-hidden group cursor-move border-2 transition-all duration-200 ${draggedIndex === index
-                                ? 'border-primary opacity-40 scale-95'
-                                : 'border-transparent hover:border-outline-variant'
+                            className={`relative aspect-square rounded-lg overflow-hidden group cursor-move transition-all duration-200 ${draggedIndex === index
+                                ? 'opacity-40 scale-95'
+                                : ''
                                 }`}
                         >
                             <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-contain select-none pointer-events-none p-1" />
