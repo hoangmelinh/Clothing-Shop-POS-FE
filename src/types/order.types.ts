@@ -1,4 +1,4 @@
-export type OrderStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED';
+export type OrderStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED' | 'RETURNED' | 'PARTIALLY_RETURNED';
 
 export interface OrderItem {
   id?: number;
@@ -46,3 +46,39 @@ export interface OrderRequest {
     quantity: number;
   }[];
 }
+
+export interface ReturnOrderItem {
+  id: number;
+  variantId: number;
+  productName: string;
+  productSku: string;
+  quantity: number;
+  refundPrice: number;
+  subtotal: number;
+}
+
+export interface ReturnOrder {
+  id: number;
+  returnNumber: string;
+  originalOrderId: number;
+  originalOrderNumber: string;
+  customerId: number;
+  customerName: string;
+  createdById: number;
+  createdByUsername: string;
+  totalRefundAmount: number;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+  items: ReturnOrderItem[];
+}
+
+export interface ReturnOrderRequest {
+  originalOrderId: number;
+  reason: string;
+  items: {
+    variantId: number;
+    quantity: number;
+  }[];
+}
+

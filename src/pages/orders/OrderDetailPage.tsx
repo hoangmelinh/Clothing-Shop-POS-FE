@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { 
   useGetOrderByIdQuery, 
-  useCancelOrderMutation 
+  useCancelOrderMutation,
+  useGetReturnOrdersByOriginalOrderIdQuery,
+  useCreateReturnOrderMutation
 } from '@/redux/api/orderApi';
 import { useGetCustomerByIdQuery } from '@/redux/api/customerApi';
 import { useGetProductsQuery } from '@/redux/api/productApi';
@@ -14,6 +17,14 @@ export default function OrderDetailPage() {
   // --- Fetch Order details ---
   const { data: orderResponse, isLoading: isOrderLoading, error } = useGetOrderByIdQuery(orderId);
   const order = orderResponse?.data;
+
+  // --- Return Order State & Hooks ---
+  const { data: returnOrdersResponse } = useGetReturnOrdersByOriginalOrderIdQuery(orderId, { skip: !orderId });
+  const [createReturnOrder, { isLoading: isSubmittingReturn }] = useCreateReturnOrderMutation();
+  
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [returnQuantities, setReturnQuantities] = useState<Record<number, number>>({});
+  const [reason, setReason] = useState('');
 
   // --- Fetch Customer details (if available) ---
   const { data: customerResponse } = useGetCustomerByIdQuery(
@@ -86,6 +97,77 @@ export default function OrderDetailPage() {
     );
   }
 
+  // --- Return Order Handlers ---
+  const discountFromVoucher = order.discountFromVoucher || 0;
+  const discountFromPoints = order.discountFromPoints || 0;
+  const totalDiscount = discountFromVoucher + discountFromPoints;
+
+  const originalSubtotal = order.items.reduce((sum, item) => {
+    const price = item.unitPrice || (item as any).price || 0;
+    return sum + price * item.quantity;
+  }, 0);
+
+  const discountRatio = originalSubtotal > 0 ? totalDiscount / originalSubtotal : 0;
+
+  const getAlreadyReturnedQty = (variantId: number) => {
+    if (!returnOrdersResponse?.data) return 0;
+    return returnOrdersResponse.data.reduce((totalQty, ret) => {
+      const retItem = ret.items?.find(i => i.variantId === variantId);
+      return totalQty + (retItem ? retItem.quantity : 0);
+    }, 0);
+  };
+
+  const handleQtyChange = (variantId: number, qty: number, maxAllowed: number) => {
+    const finalQty = Math.max(0, Math.min(qty, maxAllowed));
+    setReturnQuantities(prev => ({
+      ...prev,
+      [variantId]: finalQty
+    }));
+  };
+
+  const handleSubmitReturn = async () => {
+    const items = Object.entries(returnQuantities)
+      .map(([variantId, qty]) => ({
+        variantId: Number(variantId),
+        quantity: qty
+      }))
+      .filter(item => item.quantity > 0);
+
+    if (items.length === 0) {
+      alert('Vui lòng chọn ít nhất 1 sản phẩm để trả hàng.');
+      return;
+    }
+
+    try {
+      await createReturnOrder({
+        originalOrderId: orderId,
+        reason,
+        items
+      }).unwrap();
+      alert('Tạo phiếu trả hàng thành công!');
+      setIsReturnModalOpen(false);
+      setReturnQuantities({});
+      setReason('');
+    } catch (err: any) {
+      alert(err?.data?.message || 'Không thể tạo phiếu trả hàng này.');
+    }
+  };
+
+  const orderDate = new Date(order.createdAt);
+  const isReturnExpired = (new Date().getTime() - orderDate.getTime()) > (7 * 24 * 60 * 60 * 1000);
+
+  // --- Calculate Return Refund Amount ---
+  const alreadyRefundedTotal = returnOrdersResponse?.data?.reduce((sum, ret) => sum + ret.totalRefundAmount, 0) || 0;
+  const remainingPaidAmount = (order?.totalAmount || 0) - alreadyRefundedTotal;
+  const rawTotalRefund = Object.entries(returnQuantities).reduce((sum, [varId, qty]) => {
+    const originalItem = order?.items?.find(i => (i.variantId || (i as any).productId) === Number(varId));
+    if (!originalItem) return sum;
+    const price = originalItem.unitPrice || (originalItem as any).price || 0;
+    const refundPrice = Math.round(price * (1 - discountRatio));
+    return sum + refundPrice * qty;
+  }, 0);
+  const totalRefund = Math.min(rawTotalRefund, remainingPaidAmount);
+
   // --- Compute Totals ---
   const subtotal = order.items.reduce((sum, item) => sum + (item.unitPrice || (item as any).price || 0) * item.quantity, 0);
   const tax = Math.round(subtotal * 0.08); // 8% VAT
@@ -103,6 +185,12 @@ export default function OrderDetailPage() {
   } else if (order.status === 'CANCELLED') {
     statusBadgeVariant = 'danger';
     statusText = 'Đã hủy';
+  } else if (order.status === 'RETURNED') {
+    statusBadgeVariant = 'danger';
+    statusText = 'Đã trả hàng';
+  } else if (order.status === 'PARTIALLY_RETURNED') {
+    statusBadgeVariant = 'warning';
+    statusText = 'Trả hàng một phần';
   }
 
   return (
@@ -140,7 +228,7 @@ export default function OrderDetailPage() {
             In hóa đơn
           </button>
           
-          {order.status !== 'CANCELLED' && (
+          {order.status === 'PENDING' && (
             <button 
               disabled={isCancelling}
               onClick={handleCancelOrder}
@@ -148,6 +236,18 @@ export default function OrderDetailPage() {
             >
               <span className="material-symbols-outlined text-[18px]">undo</span>
               {isCancelling ? 'Đang hủy...' : 'Hủy đơn hàng'}
+            </button>
+          )}
+
+          {(order.status === 'COMPLETED' || order.status === 'PARTIALLY_RETURNED') && (
+            <button 
+              disabled={isReturnExpired}
+              onClick={() => setIsReturnModalOpen(true)}
+              title={isReturnExpired ? "Đã quá hạn 7 ngày trả hàng" : "Trả lại sản phẩm"}
+              className="px-md py-sm border border-primary text-primary rounded font-button text-button hover:bg-primary-container/10 flex items-center gap-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="material-symbols-outlined text-[18px]">assignment_return</span>
+              {isReturnExpired ? 'Hết hạn trả hàng' : 'Trả hàng'}
             </button>
           )}
         </div>
@@ -241,6 +341,27 @@ export default function OrderDetailPage() {
                   </div>
                 </div>
               )}
+
+              {returnOrdersResponse?.data?.map((ret) => (
+                <div className="relative" key={ret.id}>
+                  <span className="absolute -left-[31px] top-1 bg-warning text-on-warning rounded-full w-4 h-4 flex items-center justify-center border-2 border-surface"></span>
+                  <div className="flex justify-between items-start gap-sm">
+                    <div>
+                      <h4 className="font-title-sm text-title-sm text-warning font-bold">Trả hàng ({ret.returnNumber})</h4>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                        Hoàn tiền: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ret.totalRefundAmount)}
+                        {ret.reason && ` - Lý do: ${ret.reason}`}
+                      </p>
+                      <div className="text-[11px] text-on-surface-variant mt-1">
+                        Sản phẩm trả: {ret.items.map(i => `${i.productName} (x${i.quantity})`).join(', ')}
+                      </div>
+                    </div>
+                    <span className="font-body-sm text-body-sm text-outline whitespace-nowrap">
+                      {new Date(ret.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -352,6 +473,160 @@ export default function OrderDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Return Items Dialog (Modal) */}
+      {isReturnModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-surface rounded-2xl border border-outline/10 max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-md border-b border-outline/10 bg-surface-container-low flex justify-between items-center">
+              <h3 className="font-title-lg text-title-lg text-on-surface font-bold flex items-center gap-xs">
+                <span className="material-symbols-outlined text-primary text-[28px]">assignment_return</span>
+                Tạo phiếu trả hàng
+              </h3>
+              <button 
+                onClick={() => setIsReturnModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-high text-on-surface-variant transition-colors"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-md overflow-y-auto flex-1 space-y-md">
+              <div className="bg-surface-container-lowest p-sm rounded-xl border border-outline/5 text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-on-surface-variant">Mã hóa đơn gốc:</span>
+                  <span className="font-bold text-on-surface">{order.orderNumber || order.code}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-on-surface-variant">Khách hàng:</span>
+                  <span className="font-bold text-on-surface">{order.customerName || 'Khách lẻ vãng lai'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-on-surface-variant">Chiết khấu tỷ lệ áp dụng:</span>
+                  <span className="font-bold text-emerald-600">{(discountRatio * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+
+              <div className="space-y-sm">
+                <h4 className="font-title-sm text-title-sm text-on-surface font-semibold">Chọn sản phẩm trả lại</h4>
+                <div className="border border-outline/10 rounded-xl overflow-hidden">
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-surface-container border-b border-outline/10">
+                        <th className="py-sm px-md font-semibold text-on-surface-variant">Sản phẩm</th>
+                        <th className="py-sm px-md text-right font-semibold text-on-surface-variant">Giá hoàn lại</th>
+                        <th className="py-sm px-md text-center font-semibold text-on-surface-variant">Có thể trả</th>
+                        <th className="py-sm px-md text-center w-28 font-semibold text-on-surface-variant">SL trả</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-outline/5">
+                      {order.items.map((item) => {
+                        const variantId = item.variantId || (item as any).productId;
+                        const details = getVariantDetails(variantId);
+                        const price = item.unitPrice || (item as any).price || 0;
+                        const refundPrice = Math.round(price * (1 - discountRatio));
+                        const alreadyReturned = getAlreadyReturnedQty(variantId);
+                        const maxAllowed = item.quantity - alreadyReturned;
+
+                        if (maxAllowed <= 0) return null;
+
+                        return (
+                          <tr key={variantId} className="hover:bg-surface-container-lowest/50">
+                            <td className="py-sm px-md">
+                              <span className="font-semibold block">{details.name}</span>
+                              <span className="text-xs text-on-surface-variant">SKU: {details.sku}</span>
+                            </td>
+                            <td className="py-sm px-md text-right font-medium">
+                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(refundPrice)}
+                            </td>
+                            <td className="py-sm px-md text-center text-on-surface-variant">
+                              {maxAllowed} / {item.quantity}
+                            </td>
+                            <td className="py-sm px-md">
+                              <div className="flex items-center justify-center gap-xs">
+                                <button
+                                  type="button"
+                                  onClick={() => handleQtyChange(variantId, (returnQuantities[variantId] || 0) - 1, maxAllowed)}
+                                  className="w-7 h-7 rounded border border-outline/30 flex items-center justify-center hover:bg-surface-container active:bg-surface-container-high transition-colors"
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={maxAllowed}
+                                  value={returnQuantities[variantId] || 0}
+                                  onChange={(e) => handleQtyChange(variantId, parseInt(e.target.value) || 0, maxAllowed)}
+                                  className="w-10 text-center border-b border-outline/30 bg-transparent py-0.5 focus:border-primary focus:outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleQtyChange(variantId, (returnQuantities[variantId] || 0) + 1, maxAllowed)}
+                                  className="w-7 h-7 rounded border border-outline/30 flex items-center justify-center hover:bg-surface-container active:bg-surface-container-high transition-colors"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {order.items.every(i => getAlreadyReturnedQty(i.variantId || (i as any).productId) === i.quantity) && (
+                        <tr>
+                          <td colSpan={4} className="py-md text-center text-on-surface-variant italic">
+                            Tất cả sản phẩm đã được trả lại hoàn toàn.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Reason input */}
+              <div className="flex flex-col gap-xs">
+                <label className="text-sm font-semibold text-on-surface-variant">Lý do trả hàng</label>
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Nhập lý do trả hàng..."
+                  rows={3}
+                  className="w-full px-sm py-xs border border-outline/30 rounded-xl bg-transparent text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-md border-t border-outline/10 bg-surface-container-lowest flex justify-between items-center">
+              <div>
+                <span className="text-xs text-on-surface-variant block">Tổng cộng hoàn tiền</span>
+                <span className="text-xl font-bold text-primary">
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalRefund)}
+                </span>
+              </div>
+              <div className="flex gap-sm">
+                <button
+                  type="button"
+                  onClick={() => setIsReturnModalOpen(false)}
+                  className="px-md py-sm border border-outline/30 rounded font-button text-button hover:bg-surface-container text-on-surface transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  disabled={isSubmittingReturn || totalRefund <= 0}
+                  onClick={handleSubmitReturn}
+                  className="px-md py-sm bg-primary text-on-primary rounded font-button text-button hover:bg-primary-hover active:bg-primary-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-xs"
+                >
+                  {isSubmittingReturn ? 'Đang xử lý...' : 'Xác nhận trả'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
