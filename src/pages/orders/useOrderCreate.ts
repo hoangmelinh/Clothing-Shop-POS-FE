@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useGetProductsQuery } from '@/redux/api/productApi';
+import { useGetProductsQuery, useLazyGetProductByIdQuery } from '@/redux/api/productApi';
 import { useGetRecommendationsQuery } from '@/redux/api/recommendationApi';
 import { useCreateOrderMutation, useUpdateOrderMutation } from '@/redux/api/orderApi';
 import type { CartItem } from './hooks/useCart';
@@ -18,6 +18,7 @@ export function useOrderCreate() {
   const navigate = useNavigate();
 
   const { data: productData, isLoading: isProductsLoading } = useGetProductsQuery();
+  const [getProductById] = useLazyGetProductByIdQuery();
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
   const [updateOrder, { isLoading: isUpdatingOrder }] = useUpdateOrderMutation();
 
@@ -83,8 +84,20 @@ export function useOrderCreate() {
     return false;
   };
 
-  const handleAddRecommendedToCart = (productId: number) => {
-    const fullProduct = products.find(p => p.id === productId);
+  const handleAddRecommendedToCart = async (productId: number) => {
+    let fullProduct = products.find(p => p.id === productId);
+    
+    if (!fullProduct) {
+      try {
+        const res = await getProductById(productId).unwrap();
+        if (res?.data) {
+          fullProduct = res.data;
+        }
+      } catch (error) {
+        console.error("Lỗi khi tải chi tiết sản phẩm gợi ý:", error);
+      }
+    }
+
     if (fullProduct) {
       cart.handleProductClick(fullProduct);
     } else {
