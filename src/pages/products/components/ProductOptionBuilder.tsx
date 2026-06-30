@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
@@ -63,6 +64,12 @@ export function ProductOptionBuilder({ options, onChange }: ProductOptionBuilder
 
   const addOptionRow = () => {
     if (options.length >= 3) return;
+    // Kiểm tra nếu có option chưa nhập tên thì không cho thêm mới
+    if (options.some(o => !o.name.trim())) {
+      toast.error('Vui lòng nhập tên cho tuỳ chọn hiện tại trước khi thêm mới');
+      return;
+    }
+
     const newOption: ProductOption = {
       name: '',
       position: options.length + 1,
