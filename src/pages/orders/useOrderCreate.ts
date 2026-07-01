@@ -5,6 +5,7 @@ import { useGetProductsQuery, useLazyGetProductByIdQuery } from '@/redux/api/pro
 import { useGetRecommendationsQuery } from '@/redux/api/recommendationApi';
 import { useCreateOrderMutation, useUpdateOrderMutation } from '@/redux/api/orderApi';
 import type { CartItem } from './hooks/useCart';
+import type { Order } from '@/types/order.types';
 
 import { useCart } from './hooks/useCart';
 import { useCustomerSelection } from './hooks/useCustomerSelection';
@@ -24,6 +25,8 @@ export function useOrderCreate() {
 
   const [activeCategory, setActiveCategory] = useState('Tất cả');
   const [searchProductQuery, setSearchProductQuery] = useState('');
+  // Lưu đơn hàng vừa tạo để in trực tiếp tại trang POS (không navigate)
+  const [lastCreatedOrder, setLastCreatedOrder] = useState<Order | null>(null);
 
   // --- Initialize Hooks ---
   const cart = useCart();
@@ -228,11 +231,13 @@ export function useOrderCreate() {
         toast.success(`Thanh toán thành công! Mã hóa đơn: ${response.data.orderNumber}`);
       }
       checkout.setIsQRModalOpen(false);
-      clearPOSState();
-      
+
       if (checkout.autoPrint) {
-        navigate(`/orders/${response.data.id}?print=true`);
+        // Lưu đơn hàng lại để in trực tiếp trên trang POS, không chuyển trang
+        setLastCreatedOrder(response.data);
+        clearPOSState();
       } else {
+        clearPOSState();
         navigate('/orders');
       }
     } catch (error: any) {
@@ -308,6 +313,7 @@ export function useOrderCreate() {
       isCancellingOrder: pendingOrders.isCancellingOrder,
       orderIdToCancel: pendingOrders.orderIdToCancel,
       autoPrint: checkout.autoPrint,
+      lastCreatedOrder,
       recommendations,
       isRecommendationsLoading
     },
@@ -344,7 +350,8 @@ export function useOrderCreate() {
       handleCancelPendingOrder: pendingOrders.handleCancelPendingOrder,
       setOrderIdToCancel: pendingOrders.setOrderIdToCancel,
       clearPOSState,
-      handleAddRecommendedToCart
+      handleAddRecommendedToCart,
+      setLastCreatedOrder
     }
   };
 }
