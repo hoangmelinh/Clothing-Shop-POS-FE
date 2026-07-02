@@ -55,7 +55,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           onClick={onClose}
         />
       )}
-      <nav className={`fixed top-0 h-full flex flex-col py-8 w-64 border-r border-outline/5 glass-panel z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:left-0`}>
+      <nav className={`fixed top-0 h-full flex flex-col py-8 w-64 border-r border-outline/5 bg-surface z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:left-0`}>
       <div className="px-6 mb-12 flex flex-col items-start">
         <h1 className="font-sans text-[42px] font-bold text-primary tracking-tight leading-none mb-1">Sapo</h1>
         <p className="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-widest opacity-80">
@@ -71,6 +71,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             <Link
               key={item.path}
               to={item.path}
+              onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg hover-lift transition-all duration-300 group ${isActive
                 ? 'bg-gradient-to-r from-primary to-[#18754a] text-on-primary shadow-md'
                 : 'text-on-surface hover:bg-surface-container-high/50 hover:text-primary'

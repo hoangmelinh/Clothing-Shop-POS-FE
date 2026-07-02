@@ -61,25 +61,25 @@ export default function ProductDetailPage() {
     <div className="flex-1 px-margin-desktop py-lg max-w-[1440px] mx-auto w-full">
       {/* Breadcrumbs */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-lg gap-sm">
-        <nav className="flex items-center gap-xs font-body-sm text-body-sm text-on-surface-variant">
+        <nav className="flex flex-wrap items-center gap-xs font-body-sm text-body-sm text-on-surface-variant">
           <Link className="hover:text-primary transition-colors" to="/products">Kho hàng</Link>
           <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>chevron_right</span>
           <span className="hover:text-primary transition-colors">{product.category?.name || 'Danh mục'}</span>
           <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>chevron_right</span>
           <span className="text-on-surface font-medium">{product.name}</span>
         </nav>
-        <div className="flex items-center gap-sm">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-sm w-full md:w-auto mt-4 md:mt-0">
           {hasManageProductPermission && (
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="px-md py-2 bg-primary-container text-on-primary font-button text-button rounded hover:bg-primary transition-colors flex items-center gap-xs"
+              className="w-full sm:w-auto justify-center px-md py-2 bg-primary-container text-on-primary font-button text-button rounded hover:bg-primary transition-colors flex items-center gap-xs"
             >
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit</span> Chỉnh sửa
             </button>
           )}
           <button
             onClick={() => navigate('/products')}
-            className="px-md py-2 border border-primary text-primary font-button text-button rounded hover:bg-surface-container-high transition-colors flex items-center gap-xs"
+            className="w-full sm:w-auto justify-center px-md py-2 border border-primary text-primary font-button text-button rounded hover:bg-surface-container-high transition-colors flex items-center gap-xs"
           >
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span> Trở về
           </button>
