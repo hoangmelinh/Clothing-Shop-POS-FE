@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNotifications } from '@/providers/NotificationProvider';
+import type { Order } from '@/types/order.types';
 
 interface QRTransferModalProps {
   isOpen: boolean;
@@ -6,6 +8,8 @@ interface QRTransferModalProps {
   total: number;
   isCreatingOrder: boolean;
   confirmCheckout: () => void;
+  pendingOrder?: Order | null;
+  onPaymentSuccess?: (order: Order) => void;
 }
 
 export function QRTransferModal({
@@ -13,9 +17,44 @@ export function QRTransferModal({
   onClose,
   total,
   isCreatingOrder,
-  confirmCheckout
+  confirmCheckout,
+  pendingOrder,
+  onPaymentSuccess
 }: QRTransferModalProps) {
+  const { notifications } = useNotifications();
+
+  // Nghe thông báo SSE qua NotificationProvider
+  useEffect(() => {
+    if (!isOpen || !pendingOrder || !onPaymentSuccess) return;
+
+    const latestNotification = notifications[0]; // Thông báo mới nhất luôn ở đầu mảng
+    if (
+      latestNotification &&
+      latestNotification.type === 'ORDER_PAID' &&
+      latestNotification.metadata
+    ) {
+      try {
+        const metadata = JSON.parse(latestNotification.metadata);
+        if (metadata.orderNumber === pendingOrder.orderNumber) {
+          onPaymentSuccess(pendingOrder);
+        }
+      } catch (e) {
+        console.error('Lỗi parse metadata thông báo thanh toán', e);
+      }
+    }
+  }, [notifications, isOpen, pendingOrder, onPaymentSuccess]);
+
   if (!isOpen) return null;
+
+  const bankAccount = import.meta.env.VITE_SEPAY_BANK_ACCOUNT || 'SBSEPAY';
+  const bankName = import.meta.env.VITE_SEPAY_BANK_NAME || 'MBBank';
+  const accountName = import.meta.env.VITE_SEPAY_ACCOUNT_NAME || 'SHOP QUAN AO';
+  
+  // Format description
+  const description = pendingOrder?.orderNumber || 'THANH TOAN DON HANG';
+
+  // Dùng api qr.sepay.vn hoặc img.vietqr.io đều được
+  const qrUrl = `https://qr.sepay.vn/img?acc=${bankAccount}&bank=${bankName}&amount=${total}&des=${description}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -45,8 +84,8 @@ export function QRTransferModal({
         <div className="flex justify-center py-6">
           <div className="bg-white rounded-2xl p-2 shadow border border-gray-100">
             <img
-              src={`https://img.vietqr.io/image/MB-0987654321-compact2.png?amount=${total}&addInfo=Thanh toan don POS&accountName=SHOP QUAN AO`}
-              alt="Mã QR"
+              src={qrUrl}
+              alt="Mã QR Thanh Toán"
               className="w-[200px] h-[220px] object-contain rounded-lg"
             />
           </div>
@@ -57,8 +96,11 @@ export function QRTransferModal({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Đến tài khoản</p>
-              <p className="text-gray-800 text-xs font-bold">MB Bank · 0987654321</p>
-              <p className="text-gray-500 text-[10px] font-semibold mt-0.5">SHOP QUAN AO</p>
+              <p className="text-gray-800 text-xs font-bold">{bankName} · {bankAccount}</p>
+              <p className="text-gray-500 text-[10px] font-semibold mt-0.5">{accountName}</p>
+              {pendingOrder && (
+                <p className="text-blue-600 text-[10px] font-bold mt-1 bg-blue-50 px-2 py-0.5 rounded-full inline-block">Nội dung: {description}</p>
+              )}
             </div>
             <div className="text-right">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Số tiền</p>
@@ -73,26 +115,9 @@ export function QRTransferModal({
         <div className="flex gap-2 px-6 pb-6">
           <button
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-xs font-semibold text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all border border-gray-200"
+            className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all border border-gray-200 text-center"
           >
-            Hủy
-          </button>
-          <button
-            onClick={confirmCheckout}
-            disabled={isCreatingOrder}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#2ecc71] hover:bg-[#27ae60] disabled:opacity-60 text-white text-xs font-bold rounded-xl py-2.5 transition-all shadow"
-          >
-            {isCreatingOrder ? (
-              <>
-                <span className="material-symbols-outlined animate-spin text-[15px]">sync</span>
-                Đang xử lý...
-              </>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[15px]">check_circle</span>
-                Xác nhận đã nhận tiền
-              </>
-            )}
+            Quay lại
           </button>
         </div>
       </div>

@@ -4,7 +4,7 @@ export function useCheckout(total: number) {
   const [note, setNote] = useState('');
   const [customerPaid, setCustomerPaid] = useState<number | ''>('');
   const [isPaidModified, setIsPaidModified] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'QR_PAYOS'>('CASH');
+  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'QR_SEPAY'>('CASH');
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [autoPrint, setAutoPrint] = useState(true);
 

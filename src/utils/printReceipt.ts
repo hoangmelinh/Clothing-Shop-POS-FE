@@ -26,7 +26,7 @@ export function printReceipt(order: Order, products: Product[]) {
   const totalQuantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
   const printDate = new Date(order.createdAt);
 
-  const paymentMethodText = order.paymentMethod === 'QR_PAYOS' ? 'Chuyển khoản' : 'Tiền mặt';
+  const paymentMethodText = order.paymentMethod === 'QR_SEPAY' ? 'Chuyển khoản' : 'Tiền mặt';
 
   const itemsHTML = order.items.map((item) => {
     const d = getVariantDetails(item.variantId || (item as any).productId, products);
