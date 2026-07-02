@@ -36,10 +36,10 @@ export function CartItemsList({
         return (
           <div
             key={item.variant.id}
-            className="p-3.5 flex justify-between items-center transition-colors hover:bg-gray-50/50"
+            className="p-3.5 flex flex-col md:flex-row justify-between md:items-center gap-3 md:gap-0 transition-colors hover:bg-gray-50/50 relative"
           >
             {/* Product details */}
-            <div className="flex-1 min-w-0 flex gap-3 items-center">
+            <div className="flex-1 w-full min-w-0 flex gap-3 items-start md:items-center">
               {/* Fallback image */}
               <div className="w-10 h-12 bg-gray-50 border border-gray-100 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
                 {item.product.imageUrls && item.product.imageUrls.length > 0 ? (
@@ -53,12 +53,12 @@ export function CartItemsList({
                 )}
               </div>
 
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1 pr-6 md:pr-0">
                 <h4 className="text-xs font-bold text-gray-900 truncate" title={item.product.name}>
                   {item.product.name}
                 </h4>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[9px] font-mono text-gray-500 bg-gray-100 px-1 py-0.2 rounded font-semibold uppercase">
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <span className="text-[9px] font-mono text-gray-500 bg-gray-100 px-1 py-0.5 rounded font-semibold uppercase">
                     {item.variant.sku}
                   </span>
                   {item.variant.option1Value && (
@@ -75,41 +75,46 @@ export function CartItemsList({
               </div>
             </div>
 
-            {/* Unit Price */}
-            <div className="w-28 text-right text-xs font-bold text-gray-800">
-              {priceFmt}
-            </div>
+            {/* Controls */}
+            <div className="flex flex-wrap items-center justify-between md:justify-end gap-3 w-full md:w-auto pl-12 md:pl-0">
+              {/* Unit Price */}
+              <div className="md:w-28 text-left md:text-right text-xs font-bold text-gray-800">
+                <span className="md:hidden text-gray-500 font-normal mr-1 block text-[10px] uppercase">Đơn giá</span>
+                {priceFmt}
+              </div>
 
-            {/* Quantity Selector */}
-            <div className="w-32 flex justify-center items-center gap-1 select-none">
-              <button
-                onClick={() => handleUpdateQuantity(item.variant.id!, -1)}
-                className="w-7 h-7 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 rounded-lg flex items-center justify-center font-bold text-sm transition-all"
-              >
-                -
-              </button>
-              <span className="w-10 text-center font-bold text-xs text-gray-800">
-                {item.quantity}
-              </span>
-              <button
-                onClick={() => handleUpdateQuantity(item.variant.id!, 1)}
-                disabled={item.quantity >= (item.variant.quantity || 999)}
-                className="w-7 h-7 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 rounded-lg flex items-center justify-center font-bold text-sm transition-all disabled:opacity-40 disabled:pointer-events-none"
-              >
-                +
-              </button>
-            </div>
+              {/* Quantity Selector */}
+              <div className="md:w-32 flex justify-center items-center gap-1 select-none">
+                <button
+                  onClick={() => handleUpdateQuantity(item.variant.id!, -1)}
+                  className="w-7 h-7 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 rounded-lg flex items-center justify-center font-bold text-sm transition-all"
+                >
+                  -
+                </button>
+                <span className="w-10 text-center font-bold text-xs text-gray-800">
+                  {item.quantity}
+                </span>
+                <button
+                  onClick={() => handleUpdateQuantity(item.variant.id!, 1)}
+                  disabled={item.quantity >= (item.variant.quantity || 999)}
+                  className="w-7 h-7 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 rounded-lg flex items-center justify-center font-bold text-sm transition-all disabled:opacity-40 disabled:pointer-events-none"
+                >
+                  +
+                </button>
+              </div>
 
-            {/* Total Line Price */}
-            <div className="w-28 text-right text-xs font-extrabold text-blue-600">
-              {totalFmt}
+              {/* Total Line Price */}
+              <div className="md:w-28 text-right text-xs font-extrabold text-blue-600">
+                <span className="md:hidden text-gray-500 font-normal mr-1 block text-[10px] uppercase">Thành tiền</span>
+                {totalFmt}
+              </div>
             </div>
 
             {/* Remove Button */}
-            <div className="w-12 text-center">
+            <div className="absolute top-2 right-2 md:relative md:top-auto md:right-auto md:w-12 text-center">
               <button
                 onClick={() => handleRemoveFromCart(item.variant.id!)}
-                className="text-gray-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full transition-all"
+                className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full transition-all bg-white shadow-sm md:shadow-none border border-gray-100 md:border-transparent"
                 title="Xóa dòng"
               >
                 <span className="material-symbols-outlined text-[16px]">delete</span>

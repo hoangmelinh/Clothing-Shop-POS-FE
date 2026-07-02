@@ -118,14 +118,14 @@ export default function RoleSettingsPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-8 text-center sm:text-left">
         <div>
           <h1 className="text-2xl font-bold text-on-surface">Quản lý Vai Trò</h1>
           <p className="text-on-surface-variant mt-1">Thiết lập các vai trò và quyền hạn tương ứng</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="px-4 py-2 bg-primary text-on-primary rounded-lg font-medium hover:opacity-90 flex items-center gap-2"
+          className="w-full sm:w-auto px-4 py-2 bg-primary text-on-primary rounded-lg font-medium hover:opacity-90 flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined text-[20px]">add</span>
           Thêm vai trò
@@ -193,7 +193,7 @@ export default function RoleSettingsPage() {
             </div>
             
             <div className="p-6 overflow-y-auto flex-1">
-              <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <div>
                   <label className="block text-sm font-medium mb-1">Tên vai trò *</label>
                   <input
@@ -217,7 +217,7 @@ export default function RoleSettingsPage() {
 
               <div>
                 <h3 className="text-sm font-medium mb-4 pb-2 border-b border-outline/10">Danh sách Quyền hạn</h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {AVAILABLE_PERMISSIONS.map(perm => {
                     const isSelected = formData.permissions.includes(perm);
                     return (

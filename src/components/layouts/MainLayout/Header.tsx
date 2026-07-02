@@ -101,7 +101,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
           {/* Dropdown Card */}
           {isOpen && (
-            <div className="absolute right-0 mt-2 w-80 md:w-96 bg-surface shadow-2xl rounded-2xl border border-outline/10 z-40 overflow-hidden flex flex-col max-h-[500px]">
+            <div className="absolute right-0 mt-2 w-[300px] sm:w-80 md:w-96 bg-surface shadow-2xl rounded-2xl border border-outline/10 z-40 overflow-hidden flex flex-col max-h-[500px]">
               <div className="p-4 border-b border-outline/10 flex items-center justify-between bg-outline/5">
                 <span className="font-semibold text-sm text-on-surface">Thông báo ({unreadCount})</span>
                 <div className="flex gap-3">

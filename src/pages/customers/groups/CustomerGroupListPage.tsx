@@ -209,18 +209,18 @@ export default function CustomerGroupListPage() {
   return (
     <div className="flex-1 p-6 max-w-7xl mx-auto w-full">
       {/* HEADER */}
-      <header className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl border border-gray-200/60 shadow-sm">
+      <header className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6 bg-white p-4 rounded-xl border border-gray-200/60 shadow-sm">
         <h1 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
           <i className="fa-solid fa-layer-group text-blue-600"></i> Nhóm khách hàng
         </h1>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end gap-2 w-full md:w-auto">
           <Button
             variant="outline"
             onClick={handleSync}
             isLoading={isSyncing}
             disabled={isSyncing || isTriggering}
             leftIcon={<i className="fa-solid fa-rotate"></i>}
-            className="shadow-sm font-bold text-xs"
+            className="w-full sm:w-auto justify-center shadow-sm font-bold text-xs"
           >
             Đồng bộ hạng
           </Button>
@@ -230,7 +230,7 @@ export default function CustomerGroupListPage() {
             isLoading={isTriggering}
             disabled={isSyncing || isTriggering}
             leftIcon={<i className="fa-solid fa-gift"></i>}
-            className="shadow-sm font-bold text-xs text-rose-600 border-rose-200 hover:bg-rose-50"
+            className="w-full sm:w-auto justify-center shadow-sm font-bold text-xs text-rose-600 border-rose-200 hover:bg-rose-50"
           >
             Gửi voucher sinh nhật ngay
           </Button>
@@ -238,7 +238,7 @@ export default function CustomerGroupListPage() {
             variant="outline"
             onClick={() => navigate("/customers/groups/vouchers")}
             leftIcon={<i className="fa-solid fa-ticket"></i>}
-            className="shadow-sm font-bold text-xs text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+            className="w-full sm:w-auto justify-center shadow-sm font-bold text-xs text-indigo-600 border-indigo-200 hover:bg-indigo-50"
           >
             Danh sách Voucher
           </Button>
@@ -246,7 +246,7 @@ export default function CustomerGroupListPage() {
             variant="primary"
             onClick={() => setIsCreateModalOpen(true)}
             leftIcon={<i className="fa-solid fa-plus"></i>}
-            className="shadow-sm font-bold text-xs"
+            className="w-full sm:w-auto justify-center shadow-sm font-bold text-xs"
           >
             Thêm hạng thẻ
           </Button>

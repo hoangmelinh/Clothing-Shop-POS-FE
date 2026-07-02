@@ -147,7 +147,7 @@ export default function OrderCreatePage() {
         <main className="flex-1 flex flex-col p-4 gap-3 lg:overflow-hidden h-auto min-h-[500px] lg:min-h-0 lg:h-full">
 
           {/* Grid column header row */}
-          <div className="bg-white rounded-xl border border-gray-200/80 p-3.5 flex justify-between items-center text-xs text-gray-400 font-bold flex-shrink-0 shadow-sm">
+          <div className="hidden md:flex bg-white rounded-xl border border-gray-200/80 p-3.5 justify-between items-center text-xs text-gray-400 font-bold flex-shrink-0 shadow-sm">
             <div className="flex-1 min-w-0 flex items-center gap-2">
               <span className="material-symbols-outlined text-[16px]">shopping_cart</span>
               Sản phẩm ({state.cart.reduce((sum, item) => sum + item.quantity, 0)})

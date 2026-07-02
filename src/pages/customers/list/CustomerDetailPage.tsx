@@ -291,7 +291,7 @@ export default function CustomerDetailPage() {
         {/* CỘT PHẢI: TABS LỊCH SỬ ĐƠN HÀNG VÀ CHĂM SÓC */}
         <div className="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden lg:col-span-3">
           {/* THANH TABS BẰNG STATE CỦA REACT */}
-          <div className="border-b border-gray-200 bg-gray-50/60 flex text-sm font-semibold">
+          <div className="border-b border-gray-200 bg-gray-50/60 flex flex-col sm:flex-row text-sm font-semibold">
             <button
               onClick={() => setActiveTab("orders")}
               className={`px-6 py-3.5 border-b-2 transition-all flex items-center gap-2 ${activeTab === "orders"
