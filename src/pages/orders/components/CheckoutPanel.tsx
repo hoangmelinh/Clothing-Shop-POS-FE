@@ -24,8 +24,8 @@ interface CheckoutPanelProps {
   voucherCode: string;
   handleCheckout: () => void;
   isCreatingOrder: boolean;
-  paymentMethod: 'CASH' | 'QR_PAYOS';
-  setPaymentMethod: (method: 'CASH' | 'QR_PAYOS') => void;
+  paymentMethod: 'CASH' | 'QR_SEPAY';
+  setPaymentMethod: (method: 'CASH' | 'QR_SEPAY') => void;
   handleSaveTemporary: () => void;
   isSavingTemporary: boolean;
   pendingOrderId: number | null;
@@ -154,11 +154,11 @@ export const CheckoutPanel: React.FC<CheckoutPanelProps> = ({
             <button
               type="button"
               onClick={() => {
-                setPaymentMethod('QR_PAYOS');
+                setPaymentMethod('QR_SEPAY');
                 setCustomerPaid('');
                 setIsPaidModified(false);
               }}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-md transition-all ${paymentMethod === 'QR_PAYOS'
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-md transition-all ${paymentMethod === 'QR_SEPAY'
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-gray-500 hover:text-gray-800'
                 }`}

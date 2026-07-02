@@ -250,6 +250,16 @@ export default function NotificationProvider({ children }: { children: React.Rea
                   <span className="material-symbols-outlined">info</span>
                 </div>
               )}
+              {notif.type === 'ORDER_PAID' && (
+                <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                  <span className="material-symbols-outlined">check_circle</span>
+                </div>
+              )}
+              {notif.type === 'ORDER_CREATED' && (
+                <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
+                  <span className="material-symbols-outlined">shopping_bag</span>
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-on-surface">{notif.title}</p>

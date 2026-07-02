@@ -321,10 +321,15 @@ export default function OrderCreatePage() {
       {/* LIGHT-THEMED QR MODAL */}
       <QRTransferModal
         isOpen={state.isQRModalOpen}
-        onClose={() => actions.setIsQRModalOpen(false)}
+        onClose={() => {
+          actions.setIsQRModalOpen(false);
+          actions.setPendingOrderForQR(null);
+        }}
         total={state.total}
         isCreatingOrder={state.isCreatingOrder}
         confirmCheckout={actions.confirmCheckout}
+        pendingOrder={state.pendingOrderForQR}
+        onPaymentSuccess={actions.handlePaymentSuccess}
       />
 
       {/* MOCK CUSTOM PRODUCT DIALOG (F2) */}

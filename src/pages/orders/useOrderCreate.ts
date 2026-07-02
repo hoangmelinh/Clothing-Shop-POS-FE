@@ -25,8 +25,8 @@ export function useOrderCreate() {
 
   const [activeCategory, setActiveCategory] = useState('Tất cả');
   const [searchProductQuery, setSearchProductQuery] = useState('');
-  // Lưu đơn hàng vừa tạo để in trực tiếp tại trang POS (không navigate)
   const [lastCreatedOrder, setLastCreatedOrder] = useState<Order | null>(null);
+  const [pendingOrderForQR, setPendingOrderForQR] = useState<Order | null>(null);
 
   // --- Initialize Hooks ---
   const cart = useCart();
@@ -209,7 +209,7 @@ export function useOrderCreate() {
     try {
       const orderPayload = {
         customerId: customer.customerType === 'GUEST' ? 1 : (customer.selectedCustomer?.id || 1),
-        paidAmount: checkout.paymentMethod === 'QR_PAYOS' ? discounts.total : Number(checkout.customerPaid),
+        paidAmount: checkout.paymentMethod === 'QR_SEPAY' ? discounts.total : Number(checkout.customerPaid),
         note: checkout.note || undefined,
         status: 'COMPLETED' as any,
         pointsToUse: customer.customerType === 'MEMBER' ? discounts.pointsToUse : 0,
@@ -263,8 +263,49 @@ export function useOrderCreate() {
       }
       await confirmCheckout();
     } else {
-      checkout.setIsQRModalOpen(true);
+      try {
+        const orderPayload = {
+          customerId: customer.customerType === 'GUEST' ? 1 : (customer.selectedCustomer?.id || 1),
+          paidAmount: 0,
+          note: checkout.note || undefined,
+          status: 'PENDING' as any,
+          paymentMethod: 'QR_SEPAY',
+          pointsToUse: customer.customerType === 'MEMBER' ? discounts.pointsToUse : 0,
+          voucherCode: (customer.customerType === 'MEMBER' && discounts.isVoucherValid && discounts.voucherCode)
+            ? discounts.voucherCode.trim()
+            : undefined,
+          items: cart.cart.map(item => ({
+            variantId: item.variant.id as number,
+            quantity: item.quantity,
+          })),
+        };
+        
+        let response;
+        if (pendingOrders.pendingOrderId) {
+          response = await updateOrder({ id: pendingOrders.pendingOrderId, data: orderPayload }).unwrap();
+        } else {
+          response = await createOrder(orderPayload).unwrap();
+        }
+        
+        setPendingOrderForQR(response.data);
+        checkout.setIsQRModalOpen(true);
+      } catch (error: any) {
+        toast.error(error?.data?.message || 'Có lỗi xảy ra khi tạo mã thanh toán.');
+      }
     }
+  };
+
+  const handlePaymentSuccess = (orderData: any) => {
+    toast.success(`Khách đã thanh toán thành công! Mã đơn: ${orderData.orderNumber || ''}`);
+    checkout.setIsQRModalOpen(false);
+    
+    if (checkout.autoPrint) {
+      setLastCreatedOrder(orderData);
+    } else {
+      navigate('/orders');
+    }
+    clearPOSState();
+    setPendingOrderForQR(null);
   };
 
   return {
@@ -315,6 +356,7 @@ export function useOrderCreate() {
       orderIdToCancel: pendingOrders.orderIdToCancel,
       autoPrint: checkout.autoPrint,
       lastCreatedOrder,
+      pendingOrderForQR,
       recommendations,
       isRecommendationsLoading
     },
@@ -352,7 +394,9 @@ export function useOrderCreate() {
       setOrderIdToCancel: pendingOrders.setOrderIdToCancel,
       clearPOSState,
       handleAddRecommendedToCart,
-      setLastCreatedOrder
+      setLastCreatedOrder,
+      setPendingOrderForQR,
+      handlePaymentSuccess
     }
   };
 }
