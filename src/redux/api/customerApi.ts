@@ -157,7 +157,7 @@ export const customerApi = baseApi.injectEndpoints({
         method: 'POST',
         data,
       }),
-      invalidatesTags: ['Customer'],
+      invalidatesTags: ['Customer', { type: 'Customer', id: 'LIST' }],
     }),
 
     updateCustomerGroup: builder.mutation<RestResponse<CustomerGroups>, { id: number | string; data: Partial<CustomerGroups> }>({
@@ -166,7 +166,7 @@ export const customerApi = baseApi.injectEndpoints({
         method: 'PUT',
         data,
       }),
-      invalidatesTags: ['Customer'],
+      invalidatesTags: ['Customer', { type: 'Customer', id: 'LIST' }],
     }),
 
     deleteCustomerGroup: builder.mutation<RestResponse<void>, number | string>({
@@ -174,7 +174,7 @@ export const customerApi = baseApi.injectEndpoints({
         url: `/crm/customer-groups/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Customer'],
+      invalidatesTags: ['Customer', { type: 'Customer', id: 'LIST' }],
     }),
 
     syncCustomerRanks: builder.mutation<RestResponse<void>, void>({

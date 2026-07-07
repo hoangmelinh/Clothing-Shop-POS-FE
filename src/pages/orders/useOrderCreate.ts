@@ -89,7 +89,7 @@ export function useOrderCreate() {
 
   const handleAddRecommendedToCart = async (productId: number) => {
     let fullProduct = products.find(p => p.id === productId);
-    
+
     if (!fullProduct) {
       try {
         const res = await getProductById(productId).unwrap();
@@ -292,11 +292,11 @@ export function useOrderCreate() {
             quantity: item.quantity,
           })),
         };
-        
+
         const response = pendingOrders.pendingOrderId
           ? await updateOrder({ id: pendingOrders.pendingOrderId, data: orderPayload }).unwrap()
           : await createOrder(orderPayload).unwrap();
-        
+
         setPendingOrderForQR(response.data);
         checkout.setIsQRModalOpen(true);
       } catch (error: any) {
@@ -308,7 +308,7 @@ export function useOrderCreate() {
   const handlePaymentSuccess = (orderData: any) => {
     toast.success(`Khách đã thanh toán thành công! Mã đơn: ${orderData.orderNumber || ''}`);
     checkout.setIsQRModalOpen(false);
-    
+
     if (checkout.autoPrint) {
       setLastCreatedOrder(orderData);
     } else {

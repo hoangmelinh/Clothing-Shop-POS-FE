@@ -181,13 +181,30 @@ export default function CustomerDetailPage() {
               <div className="mt-1 flex items-center gap-2">
                 {!rankCode ? (
                   <Badge variant="secondary">
-                    Thành Viên
+                    Chưa xếp hạng
                   </Badge>
                 ) : (
-                  <>
-                    <Badge variant={rankVariant as any}>{rankCode === 'BRONZE' ? 'Đồng' : rankCode === 'SILVER' ? 'Bạc' : rankCode === 'GOLD' ? 'Vàng' : rankCode}</Badge>
-                  </>
+                  <div 
+                    onClick={() => {
+                      if (customer.customerGroup?.id) {
+                        navigate(`/customers/groups/${customer.customerGroup.id}`);
+                      }
+                    }}
+                    className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
+                    title="Xem chi tiết cấu hình hạng thẻ"
+                  >
+                    <Badge variant={rankVariant as any}>{rankCode === 'BRONZE' ? 'Đồng' : rankCode === 'SILVER' ? 'Bạc' : rankCode === 'GOLD' ? 'Vàng' : rankCode === 'MEMBER' ? 'Thành viên' : rankCode}</Badge>
+                  </div>
                 )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-gray-400 font-bold uppercase tracking-wider text-[10px] mb-0.5">
+                Tổng chi tiêu
+              </label>
+              <div className="text-gray-900 font-bold text-[15px] mt-1">
+                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(customer.totalSpent || 0)}
               </div>
             </div>
 

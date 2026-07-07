@@ -168,7 +168,7 @@ export default function CustomerListPage() {
         if (!code) {
           return (
             <Badge variant="secondary">
-              Thành Viên
+              Chưa xếp hạng
             </Badge>
           );
         }
