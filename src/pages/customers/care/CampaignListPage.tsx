@@ -59,16 +59,28 @@ export default function CampaignListPage() {
     setSearchKeyword("");
   };
 
-  const getRankBadge = (code?: string) => {
-    if (!code) {
+  const getRankBadge = (group?: any) => {
+    if (!group?.code) {
       return <span className="text-gray-400 text-[11px] font-medium whitespace-nowrap">Chưa xếp hạng</span>;
     }
 
+    const code = group.code;
     const variant = code === "GOLD" ? "warning" : code === "SILVER" ? "default" : "info";
     return (
-      <Badge variant={variant as any}>
-        {code === 'BRONZE' ? 'Đồng' : code === 'SILVER' ? 'Bạc' : code === 'GOLD' ? 'Vàng' : code}
-      </Badge>
+      <div 
+        onClick={(e) => {
+          e.stopPropagation();
+          if (group.id) {
+            navigate(`/customers/groups/${group.id}`);
+          }
+        }}
+        className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
+        title="Xem chi tiết cấu hình hạng thẻ"
+      >
+        <Badge variant={variant as any}>
+          {code === 'BRONZE' ? 'Đồng' : code === 'SILVER' ? 'Bạc' : code === 'GOLD' ? 'Vàng' : code === 'MEMBER' ? 'Thành viên' : code}
+        </Badge>
+      </div>
     );
   };
 
@@ -100,7 +112,7 @@ export default function CampaignListPage() {
     {
       key: "rank",
       header: "Hạng",
-      render: (cust) => getRankBadge(cust.customerGroup?.code),
+      render: (cust) => getRankBadge(cust.customerGroup),
     },
     {
       key: "totalSpent",

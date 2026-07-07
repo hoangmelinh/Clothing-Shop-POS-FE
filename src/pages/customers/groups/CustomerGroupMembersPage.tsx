@@ -98,7 +98,7 @@ export default function CustomerGroupMembersPage() {
       header: "Hạng",
       render: (row) => {
         const code = row.customerGroup?.code;
-        if (!code) return <span className="text-gray-400 text-[11px] font-medium whitespace-nowrap">Thành Viên</span>;
+        if (!code) return <span className="text-gray-400 text-[11px] font-medium whitespace-nowrap">Chưa xếp hạng</span>;
 
         let variant = "info";
         let label = code;

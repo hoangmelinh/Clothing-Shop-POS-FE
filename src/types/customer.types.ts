@@ -21,6 +21,7 @@ export interface Customer {
   createdAt: string;
   updatedAt: string;
   rewardPoints?: number;
+  totalSpent?: number;
   vouchers?: VoucherInfo[];
   customerGroup?: CustomerGroup;
 }

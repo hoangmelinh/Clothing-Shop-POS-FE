@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSearchCustomerGroupsQuery, useSyncCustomerRanksMutation, useTriggerBirthdayVouchersMutation } from "@/redux/api/customerApi";
+import { useSearchCustomerGroupsQuery, useTriggerBirthdayVouchersMutation } from "@/redux/api/customerApi";
 import type { CustomerGroups } from "@/types/customer.types";
 import { Input } from "@/components/ui/Input";
 import { Pagination } from "@/components/ui/Pagination";
@@ -24,17 +24,8 @@ export default function CustomerGroupListPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
-  const [syncCustomerRanks, { isLoading: isSyncing }] = useSyncCustomerRanksMutation();
   const [triggerBirthdayVouchers, { isLoading: isTriggering }] = useTriggerBirthdayVouchersMutation();
 
-  const handleSync = async () => {
-    try {
-      await syncCustomerRanks().unwrap();
-      toast.success("Đồng bộ hạng thẻ thành công!");
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Lỗi khi đồng bộ hạng!");
-    }
-  };
 
   const handleTriggerBirthday = async () => {
     try {
@@ -214,21 +205,12 @@ export default function CustomerGroupListPage() {
           <i className="fa-solid fa-layer-group text-blue-600"></i> Nhóm khách hàng
         </h1>
         <div className="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end gap-2 w-full md:w-auto">
-          <Button
-            variant="outline"
-            onClick={handleSync}
-            isLoading={isSyncing}
-            disabled={isSyncing || isTriggering}
-            leftIcon={<i className="fa-solid fa-rotate"></i>}
-            className="w-full sm:w-auto justify-center shadow-sm font-bold text-xs"
-          >
-            Đồng bộ hạng
-          </Button>
+
           <Button
             variant="outline"
             onClick={handleTriggerBirthday}
             isLoading={isTriggering}
-            disabled={isSyncing || isTriggering}
+            disabled={isTriggering}
             leftIcon={<i className="fa-solid fa-gift"></i>}
             className="w-full sm:w-auto justify-center shadow-sm font-bold text-xs text-rose-600 border-rose-200 hover:bg-rose-50"
           >

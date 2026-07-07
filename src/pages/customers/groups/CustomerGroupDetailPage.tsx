@@ -103,7 +103,7 @@ export default function CustomerGroupDetailPage() {
     <div className="flex-1 p-6 max-w-7xl mx-auto w-full">
       {/* HEADER */}
       <header className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-6 bg-white p-4 rounded-xl border border-gray-200/60 shadow-sm">
-        <div className="w-full text-center sm:text-left flex justify-center sm:justify-start">
+        <div className="flex-1 w-full sm:w-auto text-center sm:text-left flex justify-center sm:justify-start">
           <h1 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
             <span
               className={`${getGroupColorClass(
@@ -115,7 +115,7 @@ export default function CustomerGroupDetailPage() {
             Nhóm: {group.name.replace(/\s*\([A-Za-z]+\)/g, '')}
           </h1>
         </div>
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
           <Button
             variant="outline"
             leftIcon={<i className="fa-solid fa-arrow-left"></i>}
@@ -153,7 +153,7 @@ export default function CustomerGroupDetailPage() {
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">Hạng thẻ</span>
                 <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                  {group.code === 'BRONZE' ? 'Đồng' : group.code === 'SILVER' ? 'Bạc' : group.code === 'GOLD' ? 'Vàng' : group.code}
+                  {group.code === 'BRONZE' ? 'Đồng' : group.code === 'SILVER' ? 'Bạc' : group.code === 'GOLD' ? 'Vàng' : group.code === 'MEMBER' ? 'Thành viên' : group.code}
                 </span>
               </div>
 
