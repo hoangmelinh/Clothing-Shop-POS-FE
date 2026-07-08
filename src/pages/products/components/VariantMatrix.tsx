@@ -74,31 +74,31 @@ export function VariantMatrix({ productName, options, variants, onChange, isEdit
   }); // Không deps → chạy mỗi render, luôn sync với prop mới nhất
 
   const handleVariantImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (!files || files.length === 0) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-      try {
-          setIsUploadingImage(true);
-          const uploadedUrls = await uploadMultipleImagesToCloudinary(files);
-          
-          if (onProductImagesChange && productImages) {
-              onProductImagesChange([...productImages, ...uploadedUrls]);
-          } else if (onProductImagesChange) {
-              onProductImagesChange([...uploadedUrls]);
-          }
+    try {
+      setIsUploadingImage(true);
+      const uploadedUrls = await uploadMultipleImagesToCloudinary(files);
 
-          if (uploadedUrls.length > 0) {
-              setTempSelectedImageUrl(uploadedUrls[0]);
-          }
-      } catch (error) {
-          console.error('Lỗi khi tải ảnh lên:', error);
-          alert('Có lỗi xảy ra khi tải ảnh lên.');
-      } finally {
-          setIsUploadingImage(false);
-          if (fileInputRef.current) {
-              fileInputRef.current.value = '';
-          }
+      if (onProductImagesChange && productImages) {
+        onProductImagesChange([...productImages, ...uploadedUrls]);
+      } else if (onProductImagesChange) {
+        onProductImagesChange([...uploadedUrls]);
       }
+
+      if (uploadedUrls.length > 0) {
+        setTempSelectedImageUrl(uploadedUrls[0]);
+      }
+    } catch (error) {
+      console.error('Lỗi khi tải ảnh lên:', error);
+      alert('Có lỗi xảy ra khi tải ảnh lên.');
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
   // Lọc options hợp lệ (có name + ít nhất 1 value)
   const activeOptions = useMemo(
@@ -285,7 +285,7 @@ export function VariantMatrix({ productName, options, variants, onChange, isEdit
                       />
                       {isEditing && !isSelected && variant.id && (
                         <span className="text-[10px] text-error font-medium px-1.5 py-0.5 bg-error/10 rounded whitespace-nowrap" title={variant.isActive === false ? "Biến thể này đã bị vô hiệu hóa. Tick để kích hoạt lại." : "Biến thể này đã tồn tại, nếu bỏ chọn sẽ bị vô hiệu hóa"}>
-                          {variant.isActive === false ? 'Đã vô hiệu hóa' : 'Sẽ bị vô hiệu hóa'}
+                          {variant.isActive === false ? 'Đã vô hiệu hóa' : 'Vô hiệu hóa'}
                         </span>
                       )}
                     </div>
@@ -293,7 +293,7 @@ export function VariantMatrix({ productName, options, variants, onChange, isEdit
 
                   {/* Ảnh */}
                   <td className="px-3 py-2 text-center">
-                    <div 
+                    <div
                       className={`w-8 h-8 rounded border flex items-center justify-center overflow-hidden cursor-pointer ${isSelected ? 'border-outline/30 hover:border-primary bg-surface-container-lowest' : 'border-outline/10 opacity-50 bg-surface-container'}`}
                       onClick={() => handleOpenImageSelector(index)}
                       title={(!productImages || productImages.length === 0) ? "Vui lòng thêm ảnh ở Thư viện ảnh trước" : "Nhấn để chọn ảnh"}
@@ -414,18 +414,18 @@ export function VariantMatrix({ productName, options, variants, onChange, isEdit
             title="Thêm ảnh mới"
           >
             <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={handleVariantImageUpload}
-                disabled={isUploadingImage}
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleVariantImageUpload}
+              disabled={isUploadingImage}
             />
             {isUploadingImage ? (
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             ) : (
-                <span className="material-symbols-outlined text-4xl text-outline-variant">add</span>
+              <span className="material-symbols-outlined text-4xl text-outline-variant">add</span>
             )}
           </div>
 
@@ -435,9 +435,8 @@ export function VariantMatrix({ productName, options, variants, onChange, isEdit
             return (
               <div
                 key={i}
-                className={`relative w-24 h-24 rounded-lg border-2 cursor-pointer overflow-hidden transition-all bg-surface-container-lowest ${
-                  isSelected ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-outline/50 shadow-sm'
-                }`}
+                className={`relative w-24 h-24 rounded-lg border-2 cursor-pointer overflow-hidden transition-all bg-surface-container-lowest ${isSelected ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-outline/50 shadow-sm'
+                  }`}
                 onClick={() => setTempSelectedImageUrl(isSelected ? undefined : url)}
               >
                 <img src={url} alt={`Lựa chọn ${i}`} className="w-full h-full object-cover" />
