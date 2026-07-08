@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { useGetReceiptByIdQuery, useConfirmReceiptMutation, useCancelReceiptMutation } from '@/redux/api/receiptApi';
+import { useGetSupplierByIdQuery } from '@/redux/api/supplierApi';
 import { useAppSelector } from '@/redux/hooks';
 
 const fmtDate = (val?: string | null) => {
@@ -30,6 +31,9 @@ export default function ReceiptDetailPage() {
     const [showCancelModal, setShowCancelModal] = useState(false);
 
     const { data: receipt, isLoading, isError } = useGetReceiptByIdQuery(Number(id));
+    const { data: supplier, isLoading: isSupplierLoading } = useGetSupplierByIdQuery(receipt?.supplierId as number, {
+        skip: !receipt?.supplierId,
+    });
     const [confirmReceipt, { isLoading: isConfirming }] = useConfirmReceiptMutation();
     const [cancelReceipt, { isLoading: isCancelling }] = useCancelReceiptMutation();
 
@@ -150,7 +154,7 @@ export default function ReceiptDetailPage() {
             {/* Info grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {[
-                    { label: 'NCC ID', value: receipt.supplierId ?? '—', icon: 'local_shipping' },
+                    { label: 'Nhà cung cấp', value: isSupplierLoading ? 'Đang tải...' : (supplier?.name ?? (receipt.supplierId ? `ID: ${receipt.supplierId}` : '—')), icon: 'local_shipping' },
                     { label: 'Tổng số lượng', value: receipt.totalQuantity ?? 0, icon: 'inventory_2' },
                     { label: 'Tổng tiền', value: fmtCurrency(receipt.totalAmount), icon: 'payments' },
                     { label: 'Ngày duyệt', value: fmtDate(receipt.confirmedAt), icon: 'event_available' },
