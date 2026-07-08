@@ -21,16 +21,15 @@ export default function StockHistoryPage() {
     const [page, setPage] = useState(0);
     const size = 15;
 
-    // Lấy tất cả phiếu, sort mới nhất trước
+    // Lấy phiếu nhập đã được duyệt trực tiếp từ server
     const { data: pageData, isLoading, isFetching } = useGetReceiptsQuery({
         page,
         size,
         sort: 'createdAt,desc',
+        status: 'CONFIRMED',
     });
 
-    // Chỉ hiển thị những phiếu CONFIRMED = đã thực sự thay đổi tồn kho
-    const allReceipts = pageData?.content ?? [];
-    const confirmedReceipts = allReceipts.filter((r) => r.status === 'CONFIRMED');
+    const receipts = pageData?.content ?? [];
     const totalPages = pageData?.totalPages ?? 0;
     const totalElements = pageData?.totalElements ?? 0;
 
@@ -54,21 +53,21 @@ export default function StockHistoryPage() {
             {/* Summary cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-surface rounded-xl border border-outline/10 p-4">
-                    <div className="text-xs text-on-surface-variant uppercase font-semibold tracking-wide mb-1">Tổng phiếu đã duyệt</div>
-                    <div className="text-2xl font-bold text-primary">{confirmedReceipts.length}</div>
+                    <div className="text-xs text-on-surface-variant uppercase font-semibold tracking-wide mb-1">Số phiếu (trên trang)</div>
+                    <div className="text-2xl font-bold text-primary">{receipts.length}</div>
                     <div className="text-xs text-on-surface-variant">trong {totalElements} phiếu tổng cộng</div>
                 </div>
                 <div className="bg-surface rounded-xl border border-outline/10 p-4">
-                    <div className="text-xs text-on-surface-variant uppercase font-semibold tracking-wide mb-1">Tổng SL đã nhập</div>
+                    <div className="text-xs text-on-surface-variant uppercase font-semibold tracking-wide mb-1">Tổng SL nhập (trên trang)</div>
                     <div className="text-2xl font-bold text-on-surface">
-                        {confirmedReceipts.reduce((s, r) => s + (r.totalQuantity ?? 0), 0).toLocaleString('vi-VN')}
+                        {receipts.reduce((s, r) => s + (r.totalQuantity ?? 0), 0).toLocaleString('vi-VN')}
                     </div>
                     <div className="text-xs text-on-surface-variant">sản phẩm</div>
                 </div>
                 <div className="bg-surface rounded-xl border border-outline/10 p-4 col-span-2 md:col-span-1">
-                    <div className="text-xs text-on-surface-variant uppercase font-semibold tracking-wide mb-1">Tổng tiền đã nhập</div>
+                    <div className="text-xs text-on-surface-variant uppercase font-semibold tracking-wide mb-1">Tổng tiền (trên trang)</div>
                     <div className="text-2xl font-bold text-on-surface">
-                        {fmtCurrency(confirmedReceipts.reduce((s, r) => s + (r.totalAmount ?? 0), 0))}
+                        {fmtCurrency(receipts.reduce((s, r) => s + (r.totalAmount ?? 0), 0))}
                     </div>
                 </div>
             </div>
@@ -86,7 +85,7 @@ export default function StockHistoryPage() {
                         <span className="material-symbols-outlined animate-spin text-3xl mb-2">sync</span>
                         <p className="text-body-md">Đang tải lịch sử...</p>
                     </div>
-                ) : confirmedReceipts.length === 0 ? (
+                ) : receipts.length === 0 ? (
                     <div className="py-24 text-center text-on-surface-variant">
                         <span className="material-symbols-outlined text-4xl mb-2 text-outline/50">history</span>
                         <p className="text-body-md">Chưa có phiếu nào được duyệt.</p>
@@ -107,7 +106,7 @@ export default function StockHistoryPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-outline/10">
-                                {confirmedReceipts.map((r) => (
+                                {receipts.map((r) => (
                                     <tr 
                                         key={r.id} 
                                         onClick={() => navigate(`/warehouse/receipts/${r.id}`)}
