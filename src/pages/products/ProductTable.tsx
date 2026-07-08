@@ -40,8 +40,9 @@ export default function ProductTable({ products, getVariantStatus, onDelete }: P
                     <tbody className="divide-y divide-outline/10">
                         {products.map((product: any) => {
                             const variants = product.variants || [];
-                            const displayVariants = variants.slice(0, 3);
-                            const hasMore = variants.length > 3;
+                            const activeVariants = variants.filter((v: any) => v.isActive !== false);
+                            const displayVariants = activeVariants.slice(0, 3);
+                            const hasMore = activeVariants.length > 3;
 
                             return (
                                 <tr key={product.id} className={`hover:bg-surface-container/50 transition-colors ${product.isDeleted ? 'opacity-50 bg-error-container/10' : ''}`}>
@@ -59,7 +60,7 @@ export default function ProductTable({ products, getVariantStatus, onDelete }: P
                                                     {product.name}
                                                 </Link>
                                                 <div className="text-xs text-on-surface-variant/70 mt-0.5">
-                                                    {variants.length} biến thể
+                                                    {activeVariants.length} biến thể
                                                     {product.isDeleted && <span className="ml-2 text-error font-medium">[Đã xóa]</span>}
                                                 </div>
                                             </div>
@@ -121,7 +122,7 @@ export default function ProductTable({ products, getVariantStatus, onDelete }: P
                                         </table>
                                         {hasMore && (
                                             <div className="text-xs text-on-surface-variant/60 px-2 mt-1">
-                                                +{variants.length - 3} biến thể khác
+                                            +{activeVariants.length - 3} biến thể khác
                                             </div>
                                         )}
                                     </td>

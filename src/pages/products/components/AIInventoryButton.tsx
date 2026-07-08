@@ -38,14 +38,21 @@ export const AIInventoryButton = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        let errorMessage = 'Lỗi từ máy chủ khi gọi AI';
+        try {
+          const errData = await response.json();
+          errorMessage = errData.message || errorMessage;
+        } catch (e) {
+          // Bỏ qua nếu parse json lỗi
+        }
+        throw new Error(errorMessage);
       }
 
       const text = await response.text();
       setReport(text);
-    } catch (error) {
-      setReport('Không thể kết nối đến AI lúc này hoặc có lỗi xảy ra.');
-      toast.error('Lỗi khi gọi AI');
+    } catch (error: any) {
+      setReport(error.message || 'Không thể kết nối đến AI lúc này hoặc có lỗi xảy ra.');
+      toast.error(error.message || 'Lỗi khi gọi AI');
     } finally {
       setLoading(false);
     }
@@ -58,7 +65,7 @@ export const AIInventoryButton = () => {
 
   return (
     <>
-      <Button 
+      <Button
         variant="primary"
         onClick={openModal}
         className="bg-purple-600 hover:bg-purple-700 text-white border-none"
@@ -67,12 +74,12 @@ export const AIInventoryButton = () => {
         AI Đánh Giá Kho
       </Button>
 
-      <Modal 
-        isOpen={isModalVisible} 
+      <Modal
+        isOpen={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         title={
           <div className="flex items-center gap-2 text-purple-600">
-            <span className="material-symbols-outlined">smart_toy</span> 
+            <span className="material-symbols-outlined">smart_toy</span>
             Trợ lý AI Quản lý Kho
           </div>
         }
@@ -111,9 +118,9 @@ export const AIInventoryButton = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button 
-              variant="primary" 
-              onClick={fetchAIReport} 
+            <Button
+              variant="primary"
+              onClick={fetchAIReport}
               disabled={loading}
               className="bg-purple-600 hover:bg-purple-700 text-white"
             >
@@ -127,7 +134,7 @@ export const AIInventoryButton = () => {
               {loading ? (
                 <div className="flex items-center justify-center h-full text-purple-600">
                   <span className="material-symbols-outlined animate-spin text-2xl">sync</span>
-                  <span className="ml-2">Đang xử lý hàng ngàn dòng dữ liệu...</span>
+                  <span className="ml-2">Đang xử lý dữ liệu...</span>
                 </div>
               ) : report ? (
                 report
