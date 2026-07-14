@@ -101,6 +101,24 @@ export default function LoginPage() {
             >
               {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </Button>
+
+            <div className="flex items-center my-xs">
+              <div className="flex-grow border-t border-outline/10"></div>
+              <span className="px-sm font-label-caps text-label-caps text-on-surface-variant/40 text-[10px] tracking-widest uppercase">Hoặc</span>
+              <div className="flex-grow border-t border-outline/10"></div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('guest');
+                setPassword('123456');
+              }}
+              className="w-full py-sm rounded-none border border-outline/20 hover:border-outline/40 hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-all flex items-center justify-center gap-xs font-label-caps text-label-caps tracking-widest text-[11px] uppercase bg-transparent"
+            >
+              <span className="material-symbols-outlined text-[16px]">visibility</span>
+              <span>Dùng thử: guest / 123456 (Chỉ xem)</span>
+            </button>
           </form>
 
           <div className="mt-lg pt-md border-t border-t-outline/10 text-center">
